@@ -46,4 +46,4 @@ model.fit(x_train_flat, y_train, epochs = 10)
 
 model.evaluate(x_test_flat, y_test)
 
-model.save('my_model.keras')
+#model.save('my_model.keras')
