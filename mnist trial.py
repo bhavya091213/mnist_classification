@@ -24,6 +24,8 @@ print(x_test_flat.shape)'''
 #model declaration
 model = keras.Sequential([
     keras.layers.Dense(100, activation="relu"),
+    keras.layers.Dense(100, activation="relu"),
+    keras.layers.Dense(50, activation="relu"),
     keras.layers.Dense(10, activation='sigmoid')
 ])
 
@@ -32,18 +34,18 @@ model = keras.Sequential([
     
 
 model.compile(
-    optimizer= 'adam',
+    optimizer= 'Adamax',
     loss= 'sparse_categorical_crossentropy',
     metrics=['accuracy']
 )
 
 #fitting
 print('STARTING FITTING')
-model.fit(x_train_flat, y_train, epochs = 10)
+model.fit(x_train_flat, y_train, epochs = 15)
 
 
 #evalutation
 
 model.evaluate(x_test_flat, y_test)
 
-#model.save('my_model.keras')
+model.save('my_model.keras')

@@ -1,3 +1,18 @@
+'''
+
+THIS FILE IS AN API FOR NORMALIZING IMAGES AS WELL AS PASSING ARGUMENTS TO THE TRAINED MODEL
+
+
+mnist trial.py IS THE TRAINING FILE FOR THE MODEL
+mnistPrediction.py IS THIS FILE CONTAINING THE API
+my_model.keras IS THE TRAINED MODEL SAVED AS A FILE ACCESIBLE TO TO ANY FILE IN DIRECTORY
+testIMG IS A FOLDER FOR IMAGES THAT ARE INTENDED TO BE PASSED THROUGH THE MODEL
+
+
+'''
+
+
+
 # imports
 
 # PIL Libraries
@@ -32,8 +47,6 @@ def downscale_and_crop(img):
     # Resize the cropped image to 28x28 pixels
     img_resized = img_cropped.resize((28, 28))
     return img_resized
-
-
 
 def needToInvert(img, thrshld):
     is_light = np.mean(img) > thrshld
@@ -80,64 +93,57 @@ def center_subject(image_path):
 
     return centered_img
 
-#import an image, can be replaced with an loop to go through each item in folder
-centeredIMG = center_subject("testIMG/h.jpg")
-imgInQuestion = downscale_and_crop(centeredIMG)
+def noramlize(path):
+    centeredIMG = center_subject(path)
+    imgInQuestion = downscale_and_crop(centeredIMG)
+    if needToInvert(imgInQuestion, 137):
+        imgInQuestion = invert(imgInQuestion.convert('RGB'))
+    return imgInQuestion
 
-if needToInvert(imgInQuestion, 137):
-    imgInQuestion = invert(imgInQuestion.convert('RGB'))
+def predict(imgInQuestion):   
+    # normalized image initialzing
+    normalizedIMG = PIL.Image.new(mode="RGB", size=(28, 28))
 
+    pixelVals = []
+    image1 = []
 
-# normalized image initialzing
-# ONLY NEEDED FOR TESTING
-normalizedIMG = PIL.Image.new(mode="RGB", size=(28, 28))
+    # sets all rgb values from 0-255
+    for y in range(28):
+        #row = []
+        for x in range(28):
+            pixel_rgb = imgInQuestion.getpixel((x, y)) # x, y are the coordinates of the pixel
+            avg = float ((pixel_rgb[0] + pixel_rgb[1] + pixel_rgb[2]) / 3)
 
-pixelVals = []
+            # takes img and blackens any values that 
+            if (avg < 32):
+                avg = 0
+            elif (avg < 60):
+                avg = 40
+            elif (avg > 200):
+                avg = 230
+            elif (avg > 230):
+                avg = 255
+            # NEW PIXEL STATEMENTS FOR CREATING NEW IMAGE
+            newPixel = (int(avg), int(avg), int(avg))
+            normalizedIMG.putpixel((x,y), newPixel)
 
-image1 = []
-# sets all rgb values from 0-255
-for y in range(28):
-    #row = []
-    for x in range(28):
-        pixel_rgb = imgInQuestion.getpixel((x, y)) # x, y are the coordinates of the pixel
-        avg = float ((pixel_rgb[0] + pixel_rgb[1] + pixel_rgb[2]) / 3)
+            # 2D SHAPE OF NORMALIZED VALUES
+            #row.append(avg)
+            image1.append(avg)
+        #pixelVals.append(row)
+    pixelVals.append(image1)
 
-        # takes img and blackens any values that 
-        if (avg < 32):
-            avg = 0
-        elif (avg < 60):
-            avg = 40
-        elif (avg > 200):
-            avg = 230
-        elif (avg > 230):
-            avg = 255
-        # NEW PIXEL STATEMENTS FOR CREATING NEW IMAGE
-        newPixel = (int(avg), int(avg), int(avg))
-        normalizedIMG.putpixel((x,y), newPixel)
+    # STATEMENTS FOR OUTPUTING NORMALIZATION
+    normalizedIMG.save("normalized.jpg")
 
-        # 2D SHAPE OF NORMALIZED VALUES
-        #row.append(avg)
-        image1.append(avg)
-    #pixelVals.append(row)
-pixelVals.append(image1)
+    # WORKING WITH MODEL
+    model = models.load_model('my_model.keras')
 
+    # reshape and scale array
+    npPixelVals = np.array(pixelVals)
+    npPixelVals = npPixelVals/255.0
 
+    # PREDICT
+    prediction = model.predict(npPixelVals)
 
-# STATEMENTS FOR TESTING NORMALIZATION
-normalizedIMG.save("normalized.jpg")
-# print(pixelVals)
-# mpl.matshow(pixelVals)
-# mpl.show()
-
-# WORKING WITH MODEL
-model = models.load_model('my_model.keras')
-print("loaded model")
-
-# reshape and scale array
-npPixelVals = np.array(pixelVals)
-
-npPixelVals = npPixelVals/255.0
-prediction = model.predict(npPixelVals)
-
-
-print(prediction.argmax())
+    return(prediction.argmax())
