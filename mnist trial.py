@@ -2,7 +2,7 @@ import keras
 from keras import layers
 import matplotlib.pyplot as mpl
 import numpy as np
-
+import sklearn.metrics
 
 #loading dataset
 (x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data(path="mnist.npz")
@@ -47,5 +47,6 @@ model.fit(x_train_flat, y_train, epochs = 15)
 #evalutation
 
 model.evaluate(x_test_flat, y_test)
+sklearn.metrics.classification_report(y_train, y_test)
 
 model.save('my_model.keras')

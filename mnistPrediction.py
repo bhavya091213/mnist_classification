@@ -32,6 +32,8 @@ from keras import models
 import numpy as np
 import matplotlib.pyplot as mpl
 
+model = models.load_model('my_model.keras')
+
 def downscale_and_crop(img):    
     # Find the minimum dimension of the image
     min_dimension = min(img.size)
@@ -100,7 +102,7 @@ def noramlize(path):
         imgInQuestion = invert(imgInQuestion.convert('RGB'))
     return imgInQuestion
 
-def predict(imgInQuestion):   
+def predict(imgInQuestion, path):   
     # normalized image initialzing
     normalizedIMG = PIL.Image.new(mode="RGB", size=(28, 28))
 
@@ -134,10 +136,10 @@ def predict(imgInQuestion):
     pixelVals.append(image1)
 
     # STATEMENTS FOR OUTPUTING NORMALIZATION
-    normalizedIMG.save("normalized.jpg")
+    normalizedIMG.save("normalized " + path[-5:-4]+ ".jpg")
 
     # WORKING WITH MODEL
-    model = models.load_model('my_model.keras')
+    
 
     # reshape and scale array
     npPixelVals = np.array(pixelVals)
@@ -147,3 +149,4 @@ def predict(imgInQuestion):
     prediction = model.predict(npPixelVals)
 
     return(prediction.argmax())
+
