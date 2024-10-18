@@ -45,7 +45,7 @@ model.compile(
 
 #fitting
 print('STARTING FITTING')
-model.fit(x_train_flat, y_train, epochs = 15)
+model.fit(x_train_flat, y_train, epochs = 32)
 
 
 #evaluation of metrics
@@ -59,4 +59,4 @@ print(sklearn.metrics.classification_report(y_test, y_pred_bool))
 
 
 
-model.save('my_model.keras')
+model.save('./models/mod1.keras')

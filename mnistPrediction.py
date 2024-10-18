@@ -32,7 +32,7 @@ from keras import models
 import numpy as np
 import matplotlib.pyplot as mpl
 
-model = models.load_model('my_model.keras')
+model = models.load_model('./mod1.keras')
 
 def downscale_and_crop(img):    
     # Find the minimum dimension of the image
@@ -136,7 +136,7 @@ def predict(imgInQuestion, path):
     pixelVals.append(image1)
 
     # STATEMENTS FOR OUTPUTING NORMALIZATION
-    normalizedIMG.save("normalized " + path[-5:-4]+ ".jpg")
+    normalizedIMG.save("./normalizedImgStorage/" + "normalized " + path[-5:-4]+ ".jpg")
 
     # WORKING WITH MODEL
     
